@@ -10,31 +10,43 @@ class CardSwiper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-  print(cardList[0]);
     final _screenSize = MediaQuery.of(context).size;
-
+    
     return Container(
       padding: EdgeInsets.only(top: 10.0),
       child: Swiper(
-        itemWidth: _screenSize.width * 0.7 / 1,
-        itemHeight: _screenSize.height * 0.5 / 1,
+        itemWidth: _screenSize.width * 0.7,
+        itemHeight: _screenSize.height * 0.5,
         itemBuilder: (BuildContext context, int index) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: FadeInImage(
-              placeholder: AssetImage('assets/img/loading.gif'),
-              image: NetworkImage(
-                cardList[index].getPosterImg()
-              ),
-              fit: BoxFit.cover,
-            )
-          );
+          cardList[index].uniqueId = '${cardList[index].id}-swiper';
+          return _card(context, cardList[index]);
         },
         itemCount: cardList.length,
         layout: SwiperLayout.STACK,
-        // pagination: new SwiperPagination(),
-        // control: new SwiperControl(),
       ),
+    );
+  }
+
+  Widget _card(BuildContext context, Movie movie){
+    final movieContainer = Hero(
+            tag: movie.uniqueId,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: FadeInImage(
+                placeholder: AssetImage('assets/img/no-image.jpg'),
+                image: NetworkImage(
+                  movie.getPosterImg()
+                ),
+                fit: BoxFit.cover,
+              )
+            ),
+          );
+    
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, 'detail', arguments: movie);
+      },
+      child: movieContainer
     );
   }
 }

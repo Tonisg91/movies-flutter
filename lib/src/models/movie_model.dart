@@ -14,6 +14,9 @@ class Movies {
 
 
 class Movie {
+
+  String uniqueId;
+
   bool adult;
   String backdropPath;
   List<int> genreIds;
@@ -68,5 +71,12 @@ class Movie {
     if (posterPath == null) return 'https://cdn0.iconfinder.com/data/icons/music-instruments-14/24/Camcorder-512.png';
 
     return 'https://image.tmdb.org/t/p/w500/$posterPath';
+  }
+  
+  getBackgroundImg() {
+
+    if (backdropPath == null) return 'https://cdn0.iconfinder.com/data/icons/music-instruments-14/24/Camcorder-512.png';
+
+    return 'https://image.tmdb.org/t/p/w500/$backdropPath';
   }
 }
