@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/models/movie_model.dart';
+import 'package:movies/src/providers/movie_provider.dart';
 
 class DataSearch extends SearchDelegate {
 
   String selection = '';
+  final moviesProvider = new MoviesProvider();
 
   final movies = [
     'Aquaman',
@@ -62,27 +65,35 @@ class DataSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // Suggestions that appears when user types
+    if (query.isEmpty) return Container();
+    return FutureBuilder(
+      future: moviesProvider.getMovie(query),
+      builder: (BuildContext context, AsyncSnapshot<List<Movie>> snapshot) {
+        if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
-    Function _filterMovies = (String m) => m.toLowerCase()
-                                            .contains(query.toLowerCase());
+        final movies = snapshot.data;
+        List displayMovies = movies.map((m) => ListTile(
+          leading: FadeInImage(
+            image: NetworkImage(m.getPosterImg()),
+            placeholder: AssetImage('assets/img/no-image.jpg'),
+            width: 50.0,
+            fit: BoxFit.contain,
+          ),
+          title: Text(m.title),
+          subtitle: Text(m.originalTitle),
+          onTap: () {
+            close(context, null);
+            m.uniqueId = '';
+            Navigator.pushNamed(context, 'detail', arguments: m);
+          },
+        ))
+        .toList();
 
-    final suggestionList = (query.isEmpty) 
-                            ? recentMovies
-                            : movies.where(_filterMovies).toList();
 
-    return ListView.builder(
-      itemCount: suggestionList.length,
-      itemBuilder: (context, i) {
-        return ListTile(
-          leading: Icon(Icons.movie),
-          title: Text(suggestionList[i]),
-          onTap: (){
-            selection = suggestionList[i];
-            showResults(context);
-          }
+        return ListView(
+          children: displayMovies,
         );
       },
     );
   }
-
 }
